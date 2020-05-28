@@ -4,6 +4,7 @@ codigo_produto = []
 descricao_produto = []
 quantidade_produto = []
 
+logado = [0]
 
 def menu():
     opcao = int(input("1 - Cadastrar produto \n"
@@ -34,8 +35,23 @@ def cadastrarProduto(produto):
 
 def alterarProduto():
     tentativa = 0
-
+    print(logado)
     while tentativa < 3:
+        if logado[0] != 0:
+            produto = acharProduto()
+
+            if produto[0] not in codigo_produto:
+                print("PRODUTO NÃO CADASTRADO\n\n")
+            else:
+                descricao = input("Digite a nova descrição do produto: ")
+                quantidade = -1
+                while quantidade < 0:
+                    quantidade = int(input("Digite a nova quantidade deste produto: "))
+
+                descricao_produto[produto[1]] = descricao
+                quantidade_produto[produto[1]] = quantidade
+                tentativa = 4
+        else:
             senha_digitada = input("Senha: ")
             if senha_digitada == "yN1825*a":
                 produto = acharProduto()
@@ -50,6 +66,8 @@ def alterarProduto():
 
                     descricao_produto[produto[1]] = descricao
                     quantidade_produto[produto[1]] = quantidade
+                    logado[0] += 1
+                    tentativa = 4
             else:
                 print("SENHA INCORRETA")
                 tentativa += 1
@@ -57,13 +75,12 @@ def alterarProduto():
                     print("SEU ACESSO FOI BLOQUEADO! PROCURE O ADMINISTRADOR\n\n")
                     sys.exit()
 
-    tentativa = 4
+
 
 def excluirProduto():
     tentativa = 0
     while tentativa < 3:
-        senha_digitada = input("Senha: ")
-        if senha_digitada == "yN1825*a":
+        if logado[0] != 0:
             produto = acharProduto()
 
             if produto[0] not in codigo_produto:
@@ -76,16 +93,38 @@ def excluirProduto():
                     del (quantidade_produto[produto[1]])
 
                     print("PRODUTO EXCLUIDO COM SUCESSO\n\n")
+                    tentativa = 4
                 else:
                     print("PRODUTO NÃO EXCLUÍDO\n")
-        else:
-            print("SENHA INCORRETA")
-            tentativa += 1
-            if tentativa == 3:
-                print("SEU ACESSO FOI BLOQUEADO! PROCURE O ADMINISTRADOR\n\n")
-                sys.exit()
 
-    tentativa = 4
+        else:
+
+            senha_digitada = input("Senha: ")
+            if senha_digitada == "yN1825*a":
+                produto = acharProduto()
+
+                if produto[0] not in codigo_produto:
+                    print("PRODUTO NÃO CADASTRADO\n\n")
+                else:
+                    escolha = input("Deseja excluir o produto? (S/N) ").upper()
+                    if escolha == "S":
+                        del (codigo_produto[produto[1]])
+                        del (descricao_produto[produto[1]])
+                        del (quantidade_produto[produto[1]])
+
+                        print("PRODUTO EXCLUIDO COM SUCESSO\n\n")
+                        logado[0] += 1
+                        tentativa = 4
+                    else:
+                        print("PRODUTO NÃO EXCLUÍDO\n")
+            else:
+                print("SENHA INCORRETA")
+                tentativa += 1
+                if tentativa == 3:
+                    print("SEU ACESSO FOI BLOQUEADO! PROCURE O ADMINISTRADOR\n\n")
+                    sys.exit()
+
+
 
 
 def listaProduto():
@@ -136,11 +175,13 @@ def venderProduto():
 
 def acharProduto():
     codigo = input("Digite o código do produto: ")
-
+    posicao = 0
 
     if codigo in codigo_produto:
         posicao = codigo_produto.index(codigo)
         print("Descrição: ", descricao_produto[posicao])
         print("Quantidade: ", quantidade_produto[posicao])
+    elif posicao == 0:
+        print("Produto não cadastrado")
 
-    return codigo
+    return codigo, posicao
